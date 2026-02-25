@@ -3,3 +3,5 @@ model.ipynb
 venv
 compute1.py
 doc
+*.pkl
+*.docx

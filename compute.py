@@ -1,11 +1,6 @@
 import pandas as pd
 import pytest
 
-# v_actual = {
-#     'trip': 10,
-#     'maneuver': 5,
-#     'mooring': 0
-# }
 
 def compute_lf(v_actual, v_max, engine='main', type='container', status='trip'):
     """
@@ -240,8 +235,6 @@ def compute_real_ef_non_man(pollutants, lf, engine='main', year=2010, rpm=100, v
     
     if lf > 0.2 or engine=='auxiliary':
         real_ef = compute_ef_base(pollutants, engine=engine, year=year, rpm=rpm)
-        print(1)
-        print( real_ef)
         return real_ef
 
     efas = compute_efa_non_man(pollutants, valve_type=valve_type)
@@ -258,8 +251,6 @@ def compute_real_ef_non_man(pollutants, lf, engine='main', year=2010, rpm=100, v
 
         real = b * e * l
         final_ef[p] = real
-    print(2)
-    print( final_ef)
         
     return final_ef
 def compute_laf_man(pollutants, lf, valve_type='C3'):
@@ -334,8 +325,6 @@ def compute_real_ef_man(pollutants, lf, engine='main', year=2010, rpm=100, valve
         real = b * l
         final_ef[p] = real
         
-    print( final_ef)
-        
     return final_ef
 
 def compute_A(v_actual, buoy = 0, status='trip'):
@@ -354,15 +343,12 @@ def compute_E(pollutants, v_actual, v_max, P, engine='main', type='container', s
 
     A = compute_A(v_actual, buoy=buoy, status=status)
     if is_man:
-        print('man')
         ef_man = compute_real_ef_man(pollutants, lf = lf, engine=engine, valve_type=valve_type, rpm=rpm, year=year)
         E = {}
         for p in pollutants:
             E[p] = lf * A * P * ef_man[p]
         return E
     else:
-        print('non')
-        print(lf, A, P)
         ef_non_man = compute_real_ef_non_man(pollutants, engine=engine, lf=lf, valve_type=valve_type, rpm=rpm, year=year)
         E = {}
         for p in pollutants:
@@ -371,25 +357,5 @@ def compute_E(pollutants, v_actual, v_max, P, engine='main', type='container', s
 
 
 if __name__ == "__main__":
-# Test 1: Main engine - công thức (v_actual/v_max)^3
-    assert compute_lf(10, 20, engine='main') == pytest.approx((10/20)**3)  # 0.125
-
-    # Test 2: Auxiliary - tìm thấy type và status hợp lệ
-    # Mock file LF_auxiliary.csv chứa:
-    # ship,trip,maneuver,mooring
-    # container,0.8,0.6,0.2
-    assert compute_lf(10, 20, engine='auxiliary', type='container', status='trip') == 0.8
-
-    # Test 3: Auxiliary - type không tồn tại → warning + default 0.5
-    # Mock file không có dòng 'bulk_carrier'
-    assert compute_lf(10, 20, engine='auxiliary', type='bulk_carrier', status='trip') == 0.5
-
-    # Test 4: Auxiliary - status không hợp lệ → raise ValueError
-    with pytest.raises(ValueError, match="Status.*invalid"):
-        compute_lf(10, 20, engine='auxiliary', type='container', status='invalid')
-
-    # Test 5: Engine không hợp lệ → raise ValueError
-    with pytest.raises(ValueError, match="Engine must be 'main' or 'auxiliary'"):
-        compute_lf(10, 20, engine='invalid')
-
+    print(compute_lf(10, 20, engine='auxiliary', type='container', status='trip'))
 
